@@ -1,0 +1,312 @@
+<template>
+  <v-menu v-if="item" v-model="open" v-bind="$attrs">
+    <!-- pass through scoped slots -->
+    <template v-slot:activator="slotData">
+      <slot v-if="$scopedSlots.activator" name="activator" v-bind="slotData" />
+      <PreviewRecordChip
+        v-else
+        :value="item"
+        small
+        v-bind="slotData.attrs"
+        v-on="slotData.on"
+      ></PreviewRecordChip>
+    </template>
+    <v-card>
+      <div v-if="hasHeroOptions">
+        <component
+          v-if="recordInfo.previewOptions.heroOptions.component"
+          :is="recordInfo.previewOptions.heroOptions.component"
+          :item="item"
+          :record-info="recordInfo"
+        ></component>
+        <v-img
+          v-else
+          :src="
+            recordInfo.previewOptions.heroOptions.getPreviewImage
+              ? recordInfo.previewOptions.heroOptions.getPreviewImage(item)
+              : item.avatar
+          "
+          class="white--text align-end"
+          gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+          height="100px"
+        >
+          <template v-slot:placeholder>
+            <v-row class="fill-height ma-0" align="center" justify="center">
+              <v-icon size="100" color="grey darken-3">{{
+                recordInfo.icon
+              }}</v-icon>
+            </v-row>
+          </template>
+
+          <v-card-title class="subheading font-weight-bold"
+            >{{
+              recordInfo.previewOptions.heroOptions.getPreviewName
+                ? recordInfo.previewOptions.heroOptions.getPreviewName(item)
+                : item.name
+            }}
+          </v-card-title>
+        </v-img>
+      </div>
+      <v-list v-if="hasLineItems">
+        <v-list-item>
+          <v-list-item-avatar v-if="!hasHeroOptions">
+            <v-img v-if="item.avatar" :src="item.avatar" />
+            <v-icon v-else>{{ fallbackIcon }} </v-icon>
+          </v-list-item-avatar>
+          <v-list-item-content>
+            <template>
+              <v-list-item-title v-if="!hasHeroOptions">
+                <i v-if="item.name === undefined">{{ item.id }}</i>
+                <span v-else> {{ item.name }}</span>
+              </v-list-item-title>
+              <v-progress-linear
+                v-if="loading.loadData"
+                indeterminate
+              ></v-progress-linear>
+              <template v-else-if="itemData">
+                <v-list-item-subtitle v-for="(field, i) in fields" :key="i"
+                  >{{ renderFieldTitle(field) }}:
+                  <component
+                    v-if="getFieldComponent(field)"
+                    :is="getFieldComponent(field)"
+                    :item="itemData"
+                    :field-path="getFieldPath(field)"
+                    style="display: inline"
+                  ></component>
+                  <span v-else>{{ itemData[field] }}</span>
+                </v-list-item-subtitle>
+              </template>
+            </template>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+      <v-divider></v-divider>
+      <v-card-actions>
+        <FollowButton
+          v-if="itemData && recordInfo.followLinkModel"
+          color="primary"
+          :item="itemData"
+          :follow-link-model="recordInfo.followLinkModel"
+        ></FollowButton>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" @click="openPage()">
+          <v-icon v-if="openMode === 'openInNew'" left>mdi-open-in-new</v-icon>
+          View
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-menu>
+  <v-chip v-else small>
+    <v-avatar left>
+      <v-icon small>mdi-help</v-icon>
+    </v-avatar>
+    <i>(Not Found)</i></v-chip
+  >
+</template>
+
+<script>
+import {
+  handleError,
+  capitalizeString,
+  enterRoute,
+  generateViewRecordRoute,
+  lookupFieldInfo,
+  collapseObject,
+} from '~/services/base'
+import { executeGiraffeql } from '~/services/giraffeql'
+import FollowButton from '~/components/button/followButton.vue'
+import PreviewRecordChip from '~/components/chip/previewRecordChip.vue'
+import * as simpleModels from '~/models/simple'
+
+export default {
+  components: {
+    FollowButton,
+    PreviewRecordChip,
+  },
+  props: {
+    // avatar/name optional
+    item: {
+      type: Object,
+      required: true,
+    },
+
+    // required
+    typename: {
+      type: String,
+      required: true,
+    },
+
+    openMode: {
+      type: String,
+      default: 'openInNew',
+      validator: (value) => {
+        return ['emit', 'openInNew', 'openInDialog'].includes(value)
+      },
+    },
+  },
+
+  data() {
+    return {
+      open: false,
+      itemData: null,
+      loading: {
+        loadData: false,
+      },
+    }
+  },
+
+  computed: {
+    fallbackIcon() {
+      return this.recordInfo.icon
+    },
+    capitalizedType() {
+      return capitalizeString(this.typename)
+    },
+    // must exist
+    recordInfo() {
+      return simpleModels[`Simple${capitalizeString(this.typename)}`]
+    },
+    // if previewOptions is not specified, default to showing typename only
+    fields() {
+      return this.recordInfo.previewOptions?.fields ?? ['__typename']
+    },
+    hasHeroOptions() {
+      return !!this.recordInfo.previewOptions?.heroOptions
+    },
+    hasLineItems() {
+      return this.fields.length > 0 || !this.hasHeroOptions
+    },
+  },
+
+  watch: {
+    open() {
+      if (!this.open) return
+      this.reset()
+    },
+  },
+
+  methods: {
+    renderFieldTitle(field) {
+      return field === '__typename'
+        ? 'Type'
+        : this.recordInfo.fields?.[field]?.text ?? field
+    },
+
+    getFieldComponent(field) {
+      return this.recordInfo.fields?.[field]?.component
+    },
+
+    // pathPrefix, OR fields[0], OR the name of the field
+    getFieldPath(field) {
+      const fieldInfo = this.recordInfo.fields?.[field]
+
+      if (!fieldInfo) return null
+
+      return (
+        fieldInfo.pathPrefix ??
+        (fieldInfo.fields && fieldInfo.fields.length > 1 ? null : field)
+      )
+    },
+
+    openPage() {
+      if (this.openMode === 'openInNew') {
+        enterRoute(
+          this,
+          generateViewRecordRoute(this, {
+            typename: this.typename,
+            routeType: 'i',
+            id: this.item.id,
+          }),
+          true
+        )
+      } else if (this.openMode === 'openInDialog') {
+        this.$root.$emit('openEditRecordDialog', {
+          recordInfo: 'Public' + this.capitalizedType,
+          mode: 'view',
+          selectedItem: {
+            id: this.item.id,
+          },
+        })
+      } else {
+        // emit
+        // this.$emit()
+      }
+    },
+
+    async loadData() {
+      this.loading.loadData = true
+      try {
+        this.itemData = await executeGiraffeql(this, {
+          ['get' + this.capitalizedType]: {
+            id: true,
+            __typename: true,
+            ...(this.recordInfo &&
+              collapseObject(
+                this.fields.reduce((total, fieldKey) => {
+                  // skip if key is __typename
+                  if (fieldKey === '__typename') return total
+
+                  const fieldInfo = lookupFieldInfo(this.recordInfo, fieldKey)
+
+                  // if field is hidden, exclude
+                  if (fieldInfo.hidden) return total
+
+                  const fieldsToAdd = new Set()
+
+                  // add all fields
+                  if (fieldInfo.fields) {
+                    fieldInfo.fields.forEach((field) => fieldsToAdd.add(field))
+                  } else {
+                    fieldsToAdd.add(fieldKey)
+                  }
+
+                  // process fields
+                  fieldsToAdd.forEach((field) => {
+                    total[field] = true
+
+                    // add a serializer if there is one for the field
+                    const currentFieldInfo = this.recordInfo.fields[field]
+                    if (currentFieldInfo) {
+                      if (currentFieldInfo.serialize) {
+                        serializeMap.set(field, currentFieldInfo.serialize)
+                      }
+
+                      // if field has args, process them
+                      if (currentFieldInfo.args) {
+                        total[currentFieldInfo.args.path + '.__args'] =
+                          currentFieldInfo.args.getArgs(this)
+                      }
+                    }
+                  })
+
+                  return total
+                }, {})
+              )),
+            ...(this.recordInfo.followLinkModel && {
+              currentUserFollowLink: {
+                id: true,
+              },
+            }),
+            __args: {
+              id: this.item.id,
+            },
+          },
+        })
+      } catch (err) {
+        handleError(this, err)
+      }
+      this.loading.loadData = false
+    },
+
+    reset() {
+      this.loadData()
+    },
+  },
+}
+</script>
+<style scoped>
+.v-chip--pill .v-avatar {
+  height: 24px !important;
+  width: 24px !important;
+}
+</style>
