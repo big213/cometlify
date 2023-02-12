@@ -9,6 +9,7 @@ import {
 import { permissionsCheck } from "../../core/helpers/permissions";
 import { PaginatedService } from "../../core/services";
 import { sendCometRequest } from "../../helpers/comet";
+import { isUserLoggedIn } from "../../helpers/permissions";
 import { User } from "../../services";
 
 export class CollectionService extends PaginatedService {
@@ -36,7 +37,14 @@ export class CollectionService extends PaginatedService {
     name: {},
   };
 
-  accessControl: AccessControlMap = {};
+  accessControl: AccessControlMap = {
+    // temporary access control for demo purposes only
+    get: () => true,
+    getMultiple: () => true,
+    create: ({ req }) => isUserLoggedIn(req),
+    update: ({ req }) => isUserLoggedIn(req),
+    delete: ({ req }) => isUserLoggedIn(req),
+  };
 
   @permissionsCheck("deploy")
   async deployCollection({

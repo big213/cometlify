@@ -144,7 +144,10 @@ export default {
           to: '/',
         },
       ],
-      navItems: [generatePublicRouteObject(this, publicModels.PublicUser)],
+      navItems: [
+        generatePublicRouteObject(this, publicModels.PublicCollection),
+        generatePublicRouteObject(this, publicModels.PublicUser),
+      ],
       userItems: [
         generateUserRouteObject(this, myModels.MyCollection),
         generateUserRouteObject(this, myModels.MyApiKey),
