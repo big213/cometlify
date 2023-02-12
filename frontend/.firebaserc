@@ -1,6 +1,7 @@
 {
   "projects": {
-    "default": "giraffeql-boilerplate"
+    "default": "cometlify"
   },
-  "targets": {}
+  "targets": {},
+  "etags": {}
 }

@@ -150,6 +150,8 @@ export class UserService extends PaginatedService {
           "name",
           "description",
           "isPublic",
+          "allowEmailNotifications",
+          "cometApiKey",
         ])
       ) {
         return true;

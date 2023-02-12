@@ -13,6 +13,7 @@ export async function up(knex: Knex): Promise<void[]> {
       table.jsonb("permissions").nullable();
       table.boolean("is_public").notNullable().defaultTo(true);
       table.boolean("allow_email_notifications").notNullable().defaultTo(true);
+      table.string("comet_api_key").nullable();
       table.dateTime("created_at").notNullable().defaultTo(knex.fn.now());
       table.dateTime("updated_at").notNullable().defaultTo(knex.fn.now());
       table.string("created_by").notNullable();
@@ -38,6 +39,21 @@ export async function up(knex: Knex): Promise<void[]> {
       table.dateTime("updated_at").notNullable().defaultTo(knex.fn.now());
       table.string("created_by").notNullable();
     }),
+    knex.schema.createTable("collection", function (table) {
+      table.string("id").notNullable().primary();
+      table.string("name").notNullable();
+      table.string("avatar").nullable();
+      table.text("description").nullable();
+      table.string("symbol").notNullable();
+      table.boolean("is_numbered").notNullable().defaultTo(true);
+      table.decimal("price").nullable();
+      table.integer("max_supply").nullable();
+      table.string("collection_id").nullable();
+      table.boolean("is_deployed").notNullable().defaultTo(false);
+      table.dateTime("created_at").notNullable().defaultTo(knex.fn.now());
+      table.dateTime("updated_at").notNullable().defaultTo(knex.fn.now());
+      table.string("created_by").notNullable();
+    }),
     knex.schema.createTable("userUserFollowLink", function (table) {
       table.string("id").notNullable().primary();
       table.string("user").notNullable();
@@ -55,6 +71,7 @@ export async function down(knex: Knex): Promise<void[]> {
     knex.schema.dropTable("user"),
     knex.schema.dropTable("apiKey"),
     knex.schema.dropTable("file"),
+    knex.schema.dropTable("collection"),
     knex.schema.dropTable("userUserFollowLink"),
   ]);
 }

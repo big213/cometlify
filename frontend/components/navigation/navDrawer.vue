@@ -146,6 +146,7 @@ export default {
       ],
       navItems: [generatePublicRouteObject(this, publicModels.PublicUser)],
       userItems: [
+        generateUserRouteObject(this, myModels.MyCollection),
         generateUserRouteObject(this, myModels.MyApiKey),
         generateUserRouteObject(this, myModels.MyFile),
         {

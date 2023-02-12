@@ -8,12 +8,12 @@ export const logoHasLightVariant = process.env.logoHasLightVariant
 export const defaultGridView = process.env.defaultGridView
 
 export const firebaseConfig = {
-  apiKey: 'AIzaSyDMuwUROWZQyG93I21ofU7Cx52q42_XZ0Q',
-  authDomain: 'giraffeql-boilerplate.firebaseapp.com',
-  projectId: 'giraffeql-boilerplate',
-  storageBucket: 'giraffeql-boilerplate.appspot.com',
-  messagingSenderId: '229325360702',
-  appId: '1:229325360702:web:30786fc003bc2972970b6f',
+  apiKey: 'AIzaSyAUieB1UHGKT4aSBJIRMY1kyrFd3YQe9ik',
+  authDomain: 'cometlify.com',
+  projectId: 'cometlify',
+  storageBucket: 'cometlify.appspot.com',
+  messagingSenderId: '469669236109',
+  appId: '1:469669236109:web:f9d93688c22c759d0901c4',
 }
 
 export const routesMap = {

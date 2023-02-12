@@ -1,17 +1,18 @@
 {
   "projects": {
-    "default": "giraffeql-boilerplate"
+    "default": "cometlify"
   },
   "targets": {
-    "giraffeql-boilerplate": {
+    "cometlify": {
       "hosting": {
         "api": [
-          "giraffeql-boilerplate-api"
+          "cometlify-api"
         ],
         "cdn": [
-          "giraffeql-boilerplate-cdn"
+          "cometlify-cdn"
         ]
       }
     }
-  }
+  },
+  "etags": {}
 }

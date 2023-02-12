@@ -45,6 +45,9 @@ export const User = <RecordInfo<'user'>>{
       fields: ['currentUserFollowLink.id'],
       component: FollowColumn,
     },
+    cometApiKey: {
+      text: 'Comet API Key',
+    },
   },
   paginationOptions: {
     searchOptions: {},

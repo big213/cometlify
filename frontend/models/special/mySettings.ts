@@ -4,6 +4,6 @@ export const MySettings = {
   ...User,
   title: 'My Settings',
   editOptions: {
-    fields: ['isPublic', 'allowEmailNotifications'],
+    fields: ['isPublic', 'allowEmailNotifications', 'cometApiKey'],
   },
 }

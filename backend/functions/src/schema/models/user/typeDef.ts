@@ -105,6 +105,9 @@ export default new GiraffeqlObjectType(
         allowNull: false,
         defaultValue: true,
       }),
+      cometApiKey: generateStringField({
+        allowNull: true,
+      }),
       currentUserFollowLink:
         generateCurrentUserFollowLinkField(UserUserFollowLink),
       ...generateTimestampFields(),

@@ -22,6 +22,7 @@ export { id } from "./id";
 export { regex } from "./regex";
 export { json } from "./json";
 export { jsonString } from "./jsonString";
+export { collectionSymbol } from "./collectionSymbol";
 
 // generated scalars
 export const userRole = new GiraffeqlScalarType(

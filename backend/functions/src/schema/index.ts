@@ -6,6 +6,7 @@ import { BaseService } from "./core/services";
 import user from "./models/user/typeDef";
 import apiKey from "./models/apiKey/typeDef";
 import file from "./models/file/typeDef";
+import collection from "./models/collection/typeDef"
 /** END TypeDef Import */
 
 import userUserFollowLink from "./links/userUserFollowLink/typeDef"
@@ -15,6 +16,7 @@ import userUserFollowLink from "./links/userUserFollowLink/typeDef"
 allServices.User.setTypeDef(user);
 allServices.ApiKey.setTypeDef(apiKey);
 allServices.File.setTypeDef(file);
+allServices.Collection.setTypeDef(collection)
 /** END TypeDef Set */
 
 allServices.UserUserFollowLink.setTypeDef(userUserFollowLink)
@@ -25,6 +27,7 @@ import ApiKey from "./models/apiKey/rootResolver";
 import Github from "./models/github/rootResolver";
 import File from "./models/file/rootResolver";
 import Admin from "./models/admin/rootResolver";
+import Collection from "./models/collection/rootResolver"
 /** END RootResolver Import */
 
 import UserUserFollowLink from "./links/userUserFollowLink/rootResolver"
@@ -35,6 +38,7 @@ allServices.ApiKey.setRootResolvers(ApiKey);
 allServices.Github.setRootResolvers(Github);
 allServices.File.setRootResolvers(File);
 allServices.Admin.setRootResolvers(Admin);
+allServices.Collection.setRootResolvers(Collection);
 /** END RootResolver Set */
 
 allServices.UserUserFollowLink.setRootResolvers(UserUserFollowLink);
