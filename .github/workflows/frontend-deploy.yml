@@ -28,7 +28,7 @@ jobs:
           IMAGE_SERVING_URL: https://cdn.cometlify.com
           VER: ${{ github.ref }}
           SITE_NAME: "Cometlify"
-          SITE_DESCRIPTION: "Cometlify is a website for keeping track of your NFT collections"
+          SITE_DESCRIPTION: "Cometlify is a website that enables you to create your own NFT mints using Comet's web3 APIs"
           SITE_IMAGE_URL: https://cdn.cometlify.com/permanent/android-chrome-384x384.png
           SITE_CONTACT_EMAIL: hello@cometlify.com
           SITE_DISCORD_LINK: https://discord.gg/CpSWfub9y6
