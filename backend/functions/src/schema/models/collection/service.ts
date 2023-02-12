@@ -25,6 +25,7 @@ export class CollectionService extends PaginatedService {
   filterFieldsMap = {
     id: {},
     "createdBy.id": {},
+    isDeployed: {},
   };
 
   sortFieldsMap = {
@@ -44,6 +45,7 @@ export class CollectionService extends PaginatedService {
     create: ({ req }) => isUserLoggedIn(req),
     update: ({ req }) => isUserLoggedIn(req),
     delete: ({ req }) => isUserLoggedIn(req),
+    deploy: ({ req }) => isUserLoggedIn(req),
   };
 
   @permissionsCheck("deploy")
