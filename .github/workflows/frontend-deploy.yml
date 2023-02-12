@@ -24,7 +24,7 @@ jobs:
         working-directory: ./frontend
         run: npm run generate
         env:
-          API_URL: https://cometlify.com
+          API_URL: https://api.cometlify.com
           IMAGE_SERVING_URL: https://cdn.cometlify.com
           VER: ${{ github.ref }}
           SITE_NAME: "Cometlify"
